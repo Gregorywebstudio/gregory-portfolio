@@ -588,10 +588,15 @@ const projects=[
 const pEl=document.getElementById('projects');
 pEl.innerHTML=projects.map(p=>`<article class="project reveal" data-c="${p.c}">
  <div class="thumb" style="--g:${p.g}"><div class="ph"><small>${p.cat}</small><b>${p.n}</b></div>
- <div class="browser"><div class="bar"><i></i><i></i><i></i></div><img loading="lazy" alt="${p.n} website screenshot" src="${shot(p.u)}" onerror="this.closest('.browser').remove()"></div></div>
+ <div class="browser"><div class="bar"><i></i><i></i><i></i></div><img loading="lazy" alt="${p.n} website screenshot" data-src="${shot(p.u)}" src="${shot(p.u)}"></div></div>
  <div class="p-body"><span class="p-cat">${p.cat}</span><h3>${p.n}</h3><p>${p.d}</p><div class="p-tags">${p.t.map(x=>`<span>${x}</span>`).join('')}</div>
  <a class="p-link" href="${p.u}" target="_blank" rel="noopener">Visit live site ↗</a></div></article>`).join('');
 
+/* screenshot loader: hide frame until real screenshot (1200px) arrives; retry while mshots generates */
+document.querySelectorAll('.thumb .browser').forEach(br=>{br.style.opacity='0';const img=br.querySelector('img');let n=0;
+ const check=()=>{ if(img.naturalWidth>=1000){br.style.opacity='1';} else if(n++<8){setTimeout(()=>{img.src=img.dataset.src+'&r='+Date.now()},5000);} else br.remove(); };
+ img.addEventListener('load',check); img.addEventListener('error',()=>{ if(n++<8) setTimeout(()=>{img.src=img.dataset.src+'&r='+Date.now()},5000); else br.remove(); });
+ if(img.complete&&img.naturalWidth) check();});
 const more=[
  ["corporate","Concierge Healthcare Website Design","Sollis Health"],
  ["wellness","Holistic Wellness Website Design","Health coaching & equine therapy"],
